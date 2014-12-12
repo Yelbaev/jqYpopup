@@ -78,7 +78,7 @@ $.fn.ypopup = function(o){
 			if( h > ( wh - x ) ) h = wh - x;
 
 // <<<----------------------------------------------------------- HEIGHT
-
+			if( o.html ) html = o.html;
 		}
 		else if( !html ) {
 			if( console && console.log ) { console.log( "jqYpopup: No data to popup" ); }
@@ -96,6 +96,7 @@ $.fn.ypopup = function(o){
 			var p = jQuery( '#ypopup' );
 
 			$(window).resize(function(){
+				var d = jQuery( '#ypopup-inner' )
 				if( typeof d == "undefined" || !d ) return;
 				ww = $(window).width();
 				wh = $(window).height();
@@ -110,15 +111,16 @@ $.fn.ypopup = function(o){
 
 				d.animate( {'margin-top': ( wh - d.outerHeight() ) / 2 + "px"}, { delay: 300, complete: function(){
 					var button = $( '#ypopup-close' );
-
-					var left = (d.offset()).left + w - 12.5;
-					var top = (d.offset()).top - 12.5;
+console.log( d.offset() );
+					var left = (d.offset()).left - $(window).scrollLeft() + w - button.height() / 2;
+					var top = (d.offset()).top - $(window).scrollTop() - button.height() / 2;
 					if( left < 0 ) left = 0;
 					else if( left > ww ) left = ww - button.width();
 					if( top < 0 ) top = 0;
 					else if( top > wh ) top = wh - button.height();
 					button
 						.css( { left: left, top: top })
+						.delay(10)
 						.show();
 					}
 				});
@@ -131,12 +133,14 @@ $.fn.ypopup = function(o){
 
 			p.css({
 				"position": "fixed",
-				"background": "rgba( 155, 155, 155, 0.5 )",
 				"width": "100%",
 				"height": "100%",
 				"left": 0,
 				"top": 0
 			});
+			
+			if( o.overlay && o.overlay.bg ) p.css( "background", o.overlay.bg );
+			else p.css( "background", "rgba( 155, 155, 155, 0.5 )" );
 
 			p.append( $( '<div />' ).attr( "id", "ypopup-inner" ) );
 
@@ -144,8 +148,13 @@ $.fn.ypopup = function(o){
 		
 			d.html( html );
 
+			if( o.popup && o.popup.bg ) d.css( "background", o.popup.bg );
+			else d.css( "background", "#f2f2f2" );
+
+			if( o.popup && o.popup.bg ) d.css( "background", o.popup.bg );
+			else d.css( "background", "#f2f2f2" );
+
 			d.css({
-				"background": "#f2f2f2", 
 				"border": "1px solid #909090", 
 				"-webkit-border-radius": "4px", 
 				"-moz-border-radius": "4px", 
@@ -167,60 +176,61 @@ $.fn.ypopup = function(o){
 				event.stopPropagation();
 			});
 
-			p
-				.on( 'click touchend', function(){ p.fadeOut( 500 ) })
-				.fadeIn( 500 );
 
-			p.append( 
-				$('<a />')
-					.attr( { 
-						"href":"javascript:void(0)", 
-						"title": "Close" ,
-						"id": "ypopup-close"
+
+			if( o.close !== false ) {
+				p
+					.on( 'click touchend', function(){ p.fadeOut( 500, function(){ $(this).remove() } ) })
+					.fadeIn( 500 );
+
+				p.append( 
+					$('<a />')
+						.attr( { 
+							"href":"javascript:void(0)", 
+							"title": "Close" ,
+							"id": "ypopup-close"
+						})
+						.html('&#10005;') 
+				);
+				$( '#ypopup-close' )
+					.css({
+						"background": "#f2f2f2",
+						"border": "1px solid black",
+
+						"-webkit-border-radius": "100%",
+						"-khtml-border-radius": "100%",
+						"-moz-border-radius": "100%",
+						"-o-border-radius": "100%",
+						"border-radius": "100%",
+
+						"-webkit-box-shadow": "0 0 2px #000",
+						"-moz-box-shadow": "0 0 2px #000",
+						"-o-box-shadow": "0 0 2px #000",
+						"box-shadow": "0 0 2px #000",
+
+						"color": "#000",
+						"cursor": "pointer",
+						"display": "none",
+						"font-family": "Arial",
+						"font-size": "18px",
+						"font-weight": "bolder",
+						"line-height": "25px",
+						"position": "absolute",
+						"left": "0px",
+						"text-align": "center",
+						"text-decoration": "none",
+
+						"-webkit-text-shadow": "0 0 1px #f0f0f0",
+						"-moz-text-shadow": "0 0 1px #f0f0f0",
+						"-o-text-shadow": "0 0 1px #f0f0f0",
+						"text-shadow": "0 0 1px #f0f0f0",
+
+						"top": "0px",
+						"vertical-align": "middle",
+						"width": "25px",
 					})
-					.html('&#10005;') 
-			);
-
-
-
-			$( '#ypopup-close' )
-				.css({
-					"background": "#f2f2f2",
-					"border": "1px solid black",
-
-					"-webkit-border-radius": "100%",
-					"-khtml-border-radius": "100%",
-					"-moz-border-radius": "100%",
-					"-o-border-radius": "100%",
-					"border-radius": "100%",
-
-					"-webkit-box-shadow": "0 0 2px #000",
-					"-moz-box-shadow": "0 0 2px #000",
-					"-o-box-shadow": "0 0 2px #000",
-					"box-shadow": "0 0 2px #000",
-
-					"color": "#000",
-					"cursor": "pointer",
-					"display": "none",
-					"font-family": "Arial",
-					"font-size": "18px",
-					"font-weight": "bolder",
-					"height": "25px",
-					"position": "absolute",
-					"left": "0px",
-					"text-align": "center",
-					"text-decoration": "none",
-
-					"-webkit-text-shadow": "0 0 1px #f0f0f0",
-					"-moz-text-shadow": "0 0 1px #f0f0f0",
-					"-o-text-shadow": "0 0 1px #f0f0f0",
-					"text-shadow": "0 0 1px #f0f0f0",
-
-					"top": "0px",
-					"vertical-align": "middle",
-					"width": "25px",
-				})
-				.on( 'click touchend', function(){ p.fadeOut( 500 ) })
+					.on( 'click touchend', function(){ p.trigger('click') });
+			}
 
 			d.animate( {'margin-top': ( wh - d.outerHeight() ) / 2 + "px"}, { duration: 300, complete: function(){ $(window).trigger('resize') }
 			});
